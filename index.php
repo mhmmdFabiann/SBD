@@ -195,7 +195,7 @@
         <div class="container">
         <div class="row align-items-center justify-content-center">
           <div class="col-md-7">
-            <h3>Login to <strong>Unnes E-Learning</strong></h3>
+            <h3>Login to <strong>Unnes</strong></h3>
             <form action="index.php" method="POST">
               <div class="form-group first">
                 <label for="username">Username</label>
