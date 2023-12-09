@@ -107,6 +107,46 @@
     </style>
 </head>
 <body>
+<?php
+require 'koneksi.php';
+
+$message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = isset($_POST['email']) ? $_POST['email'] : '';
+    $password = isset($_POST['password']) ? $_POST['password'] : '';
+    $role = isset($_POST['role']) ? $_POST['role'] : '';
+
+    if (empty($role)) {
+        $message = 'Pilih peran (Mahasiswa/Dosen).';
+    } else {
+        $query = '';
+        $redirectPage = '';
+
+        if ($role == 'mahasiswa') {
+            $query = "SELECT * FROM mahasiswa WHERE email = '$email' AND password_mahasiswa = '$password'";
+            $redirectPage = 'mahasiswa.php';
+        } elseif ($role == 'dosen') {
+            $query = "SELECT * FROM dosen WHERE email_dosen = '$email' AND password_dosen = '$password'";
+            $redirectPage = 'dosen.php';
+        }
+
+        $result = $conn->query($query);
+
+        if ($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            $namaUser = ($role == 'mahasiswa') ? $user['nama_mhs'] : $user['nama_dosen'];
+            header("Location: $redirectPage?nama_user=$namaUser");
+            exit();
+        } else {
+            $message = 'Email atau password salah.';
+        }
+    }
+} else {
+    $message = '';
+}
+?>
+
 <div class="d-lg-flex half">
     <div class="bg order-1 order-md-2" style="background-image: url('asset/rektorat_unnes.jpg')"></div>
     <div class="contents order-2 order-md-1">
@@ -122,6 +162,11 @@
               <div class="form-group last mb-3">
                 <label for="password">Password</label>
                 <input type="password" class="form-control" placeholder="Your Password" id="password">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-600">Role</label>
+                <input type="radio" name="role" value="mahasiswa" checked> Mahasiswa
+                <input type="radio" name="role" value="dosen"> Dosen
               </div>
               <input type="submit" value="Log In" class="btn btn-block btn-primary">
               <?php if (!empty($message)): ?>
