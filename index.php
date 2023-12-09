@@ -29,11 +29,7 @@
             padding: 7rem 0; }
 
         h2 {
-            text-align: center;
-            color: #4a4a4a;
-            font-size: 28px;
-            font-weight: 600;
-            line-height: 1.2; }
+            font-size: 20px; }
 
         .half, .half .container > .row {
             height: 100vh; }
@@ -115,20 +111,27 @@
     <div class="bg order-1 order-md-2" style="background-image: url('asset/rektorat_unnes.jpg')"></div>
     <div class="contents order-2 order-md-1">
         <div class="container">
-            <div class="row align-items-center justify-content-center">
-                <div class="col-md-7">
-                <h3 class="col-md-12 text-center mb-3">Login to <strong>Unnes E-Learning</strong></h3>
-                    <div class="card-body">
-                        <div class="text-center mb-3">
-                            <a href="cek_login.php?type=dosen" class="btn btn-primary btn-block">Login as Dosen</a>
-                            <div class="mt-2"></div> <!-- Menambahkan celah antara tombol Dosen dan Mahasiswa -->
-                            <a href="cek_login.php?type=mahasiswa" class="btn btn-success btn-block">Login as Mahasiswa</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="row align-items-center justify-content-center">
+          <div class="col-md-7">
+            <h3>Login to <strong>Unnes</strong></h3>
+            <form action="index.php" method="POST">
+              <div class="form-group first">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" placeholder="your-email@gmail.com" id="username">
+              </div>
+              <div class="form-group last mb-3">
+                <label for="password">Password</label>
+                <input type="password" class="form-control" placeholder="Your Password" id="password">
+              </div>
+              <input type="submit" value="Log In" class="btn btn-block btn-primary">
+              <?php if (!empty($message)): ?>
+                        <div class="mt-3 text-red-500"><?php echo $message; ?></div>
+            <?php endif; ?>
+            </form>
+          </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>
