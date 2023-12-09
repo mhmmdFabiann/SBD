@@ -88,114 +88,33 @@
             top: 2px;
             font-size: 14px; }
 
-        .control {
-            display: block;
-            position: relative;
+
+        .contents .btn {
+            height: 54px;
             padding-left: 30px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            font-size: 14px; }
-            .control .caption {
-                position: relative;
-                top: .2rem;
-                color: #888; }
+            padding-right: 30px;
+            color: #fff; /* Menambahkan warna putih pada teks tombol */
+        }
 
-        .control input {
-            position: absolute;
-            z-index: -1;
-            opacity: 0; }
+        .contents .btn-primary {
+            background-color: #007bff; /* Warna tombol untuk Dosen */
+        }
 
-        .control__indicator {
-            position: absolute;
-            top: 2px;
-            left: 0;
-            height: 20px;
-            width: 20px;
-            background: #e6e6e6;
-            border-radius: 4px; }
+        .contents .btn-success {
+            background-color: #28a745; /* Warna tombol untuk Mahasiswa */
+        }
 
-        .control--radio .control__indicator {
-            border-radius: 50%; }
-
-        .control:hover input ~ .control__indicator,
-        .control input:focus ~ .control__indicator {
-            background: #ccc; }
-
-        .control input:checked ~ .control__indicator {
-            background: #007bff; }
-
-        .control:hover input:not([disabled]):checked ~ .control__indicator,
-        .control input:checked:focus ~ .control__indicator {
-            background: #1a88ff; }
-
-        .control input:disabled ~ .control__indicator {
-            background: #e6e6e6;
-            opacity: 0.9;
-            pointer-events: none; }
-
-        .control__indicator:after {
-            font-family: 'icomoon';
-            content: '\e5ca';
-            position: absolute;
-            display: none;
-            font-size: 16px;
-            -webkit-transition: .3s all ease;
-            -o-transition: .3s all ease;
-            transition: .3s all ease; }
-
-        .control input:checked ~ .control__indicator:after {
-            display: block;
-            color: #fff; }
-
-        .control--checkbox .control__indicator:after {
-            top: 50%;
-            left: 50%;
-            margin-top: -1px;
-            -webkit-transform: translate(-50%, -50%);
-            -ms-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%); }
-
-        .control--checkbox input:disabled ~ .control__indicator:after {
-            border-color: #7b7b7b; }
-
-        .control--checkbox input:disabled:checked ~ .control__indicator {
-            background-color: #7e0cf5;
-            opacity: .2; }
     </style>
 </head>
 <body>
-    <?php
-    require 'koneksi.php';
-
-    $message = '';
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $email = isset($_POST['email']) ? $_POST['email'] : '';
-        $password = isset($_POST['password']) ? $_POST['password'] : '';
-    
-        $query = "SELECT * FROM mahasiswa WHERE email = '$email' AND password_mhs = '$password'";
-        $result = $conn->query($query);
-    
-        if ($result->num_rows > 0) {
-            $mahasiswa = $result->fetch_assoc();
-            $namaMahasiswa = $mahasiswa['nama'];
-            header('Location: mahasiswa.php?nama_mhs='.$namaMahasiswa.'');
-            exit();
-        } else {
-            $message = 'Email atau password salah.';
-        }
-    } else {
-        $message = '';
-    }
-    ?>
-
-    <div class="d-lg-flex half">
-        <div class="bg order-1 order-md-2" style="background-image: url('asset/rektorat_unnes.jpg')"></div>
-        <div class="contents order-2 order-md-1">
+<div class="d-lg-flex half">
+    <div class="bg order-1 order-md-2" style="background-image: url('asset/rektorat_unnes.jpg')"></div>
+    <div class="contents order-2 order-md-1">
         <div class="container">
+<<<<<<< HEAD
         <div class="row align-items-center justify-content-center">
           <div class="col-md-7">
-            <h3>Login to <strong>Unnes E-Learning</strong></h3>
+            <h3>Login to <strong>Unnes</strong></h3>
             <form action="index.php" method="POST">
               <div class="form-group first">
                 <label for="username">Username</label>
@@ -211,9 +130,23 @@
             <?php endif; ?>
             </form>
           </div>
+=======
+            <div class="row align-items-center justify-content-center">
+                <div class="col-md-7">
+                    <h3>Login to <strong>Unnes E-Learning</strong></h3>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <a href="cek_login.php?type=dosen" class="btn btn-primary btn-block">Login as Dosen</a>
+                            <div class="mt-2"></div> <!-- Menambahkan celah antara tombol Dosen dan Mahasiswa -->
+                            <a href="cek_login.php?type=mahasiswa" class="btn btn-success btn-block">Login as Mahasiswa</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+>>>>>>> rizal
         </div>
-      </div>
     </div>
-  </div>
+</div>
+
 </body>
 </html>
