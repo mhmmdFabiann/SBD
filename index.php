@@ -8,7 +8,7 @@
 </head>
 <style>
     body {
-        background-image: url('./unnes.jpg');
+        background-image: url('./rektorat_unnes.jpg');
         background-size: cover;
         background-position: center;
         height: 100vh;
