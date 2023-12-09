@@ -15,8 +15,8 @@ if (isset($_GET['nama_user'])) {
 
         // Mengambil mata kuliah yang diambil oleh mahasiswa berdasarkan NIM
         $queryMataKuliah = "SELECT mk.* FROM mata_kuliah mk
-                            JOIN mengambil_mk mmk ON mk.kode_mk = mmk.kode_mk
-                            WHERE mmk.NIM = '$NIM'";
+                            JOIN pengambilan_mk mmk ON mk.kode_mk = mmk.kode_mk
+                            WHERE mmk.id_mahasiswa = '$NIM'";
 
         $resultMataKuliah = mysqli_query($conn, $queryMataKuliah);
 

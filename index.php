@@ -3,109 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem E-Learning</title>
-    <link rel="stylesheet" href="bootstrap\css\bootstrap.min.css">
-    <style>
-        body {
-            font-family: "Roboto", sans-serif;
-            background-color: #fff; }
-
-        p {
-            color: #b3b3b3;
-            font-weight: 300; }
-
-        h1, h2, h3, h4, h5, h6,
-        .h1, .h2, .h3, .h4, .h5, .h6 {
-            font-family: "Roboto", sans-serif; }
-
-        a {
-            -webkit-transition: .3s all ease;
-            -o-transition: .3s all ease;
-            transition: .3s all ease; }
-            a:hover {
-                text-decoration: none !important; }
-
-        .content {
-            padding: 7rem 0; }
-
-        h2 {
-            font-size: 20px; }
-
-        .half, .half .container > .row {
-            height: 100vh; }
-
-        @media (max-width: 991.98px) {
-            .half .bg {
-                height: 500px; } }
-
-        .half .contents, .half .bg {
-            width: 50%; }
-            @media (max-width: 1199.98px) {
-                .half .contents, .half .bg {
-                    width: 100%; } }
-            .half .contents .form-group, .half .bg .form-group {
-                margin-bottom: 0;
-                border: 1px solid #efefef;
-                padding: 15px 15px;
-                border-bottom: none; }
-                .half .contents .form-group.first, .half .bg .form-group.first {
-                    border-top-left-radius: 7px;
-                    border-top-right-radius: 7px; }
-                .half .contents .form-group.last, .half .bg .form-group.last {
-                    border-bottom: 1px solid #efefef;
-                    border-bottom-left-radius: 7px;
-                    border-bottom-right-radius: 7px; }
-                .half .contents .form-group label, .half .bg .form-group label {
-                    font-size: 12px;
-                    display: block;
-                    margin-bottom: 0;
-                    color: #b3b3b3; }
-            .half .contents .form-control, .half .bg .form-control {
-                border: none;
-                padding: 0;
-                font-size: 20px;
-                border-radius: 0; }
-                .half .contents .form-control:active, .half .contents .form-control:focus, .half .bg .form-control:active, .half .bg .form-control:focus {
-                    outline: none;
-                    -webkit-box-shadow: none;
-                    box-shadow: none; }
-
-        .half .bg {
-            background-size: cover;
-            background-position: center; }
-
-        .half a {
-            color: #888;
-            text-decoration: underline; }
-
-        .half .btn {
-            height: 54px;
-            padding-left: 30px;
-            padding-right: 30px; }
-
-        .half .forgot-pass {
-            position: relative;
-            top: 2px;
-            font-size: 14px; }
-
-
-        .contents .btn {
-            height: 54px;
-            padding-left: 30px;
-            padding-right: 30px;
-            color: #fff; /* Menambahkan warna putih pada teks tombol */
-        }
-
-        .contents .btn-primary {
-            background-color: #007bff; /* Warna tombol untuk Dosen */
-        }
-
-        .contents .btn-success {
-            background-color: #28a745; /* Warna tombol untuk Mahasiswa */
-        }
-
-    </style>
+    <title>Learning Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<style>
+    body {
+        background-image: url('./unnes.jpg');
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card {
+        background: #ededed;
+    }
+</style>
 <body>
 <?php
 require 'koneksi.php';
@@ -124,10 +40,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $redirectPage = '';
 
         if ($role == 'mahasiswa') {
-            $query = "SELECT * FROM mahasiswa WHERE email = '$email' AND password_mahasiswa = '$password'";
+            $query = "SELECT * FROM mahasiswa WHERE email_mhs = '$email' AND password_mhs = '$password'";
             $redirectPage = 'mahasiswa.php';
         } elseif ($role == 'dosen') {
-            $query = "SELECT * FROM dosen WHERE email_dosen = '$email' AND password_dosen = '$password'";
+            $query = "SELECT * FROM dosen WHERE email_dsn = '$email' AND password_dsn = '$password'";
             $redirectPage = 'dosen.php';
         }
 
@@ -135,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows > 0) {
             $user = $result->fetch_assoc();
-            $namaUser = ($role == 'mahasiswa') ? $user['nama_mhs'] : $user['nama_dosen'];
+            $namaUser = ($role == 'mahasiswa') ? $user['nama'] : $user['nama_dsn'];
             header("Location: $redirectPage?nama_user=$namaUser");
             exit();
         } else {
@@ -147,33 +63,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<div class="d-lg-flex half">
-    <div class="bg order-1 order-md-2" style="background-image: url('asset/rektorat_unnes.jpg')"></div>
-    <div class="contents order-2 order-md-1">
-        <div class="container">
-        <div class="row align-items-center justify-content-center">
-          <div class="col-md-7">
-            <h3>Login to <strong>Unnes</strong></h3>
-            <form action="index.php" method="POST">
-              <div class="form-group first">
-                <label for="username">Username</label>
-                <input type="text" class="form-control" placeholder="your-email@gmail.com" id="username">
-              </div>
-              <div class="form-group last mb-3">
-                <label for="password">Password</label>
-                <input type="password" class="form-control" placeholder="Your Password" id="password">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-600">Role</label>
-                <input type="radio" name="role" value="mahasiswa" checked> Mahasiswa
-                <input type="radio" name="role" value="dosen"> Dosen
-              </div>
-              <input type="submit" value="Log In" class="btn btn-block btn-primary">
-              <?php if (!empty($message)): ?>
+<div class="container mt-5">
+    <div class="flex justify-center">
+        <div class="w-96">
+            <div class="bg-slate-100 shadow-md rounded-md p-4">
+                <div class=" text-slate-300 text-center py-2 mb-4 rounded-md">
+                    <h2 class="text-lg font-semibold text-black">Login</h2>
+                </div>
+                <form action="index.php" method="POST" role="form">
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-600">Email</label>
+                        <input type="email" name="email" id="email" class="w-full mt-1 p-2 border-2 border-slate-400 rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password" class="block text-sm font-medium text-gray-600">Password</label>
+                        <input type="password" name="password" id="password" class="w-full mt-1 p-2  border-2 border-slate-400 rounded-md" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-600">Role</label>
+                        <input type="radio" name="role" value="mahasiswa" checked> Mahasiswa
+                        <input type="radio" name="role" value="dosen"> Dosen
+                    </div>
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md">Login</button>
+                    <?php if (!empty($message)): ?>
                         <div class="mt-3 text-red-500"><?php echo $message; ?></div>
-            <?php endif; ?>
-            </form>
-          </div>
+                    <?php endif; ?>
+                </form>
+            </div>
         </div>
     </div>
 </div>
