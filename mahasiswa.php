@@ -1,3 +1,27 @@
+<?php
+require 'koneksi.php';
+
+// Mengecek apakah parameter nama_mhs ada di URL
+if (isset($_GET['nama_user'])) {
+    $namaMahasiswa = $_GET['nama_user'];
+
+    // Mengambil NIM berdasarkan nama mahasiswa
+    $queryNIM = "SELECT id_mahasiswa FROM mahasiswa WHERE nama = '$namaMahasiswa'";
+    $resultNIM = mysqli_query($conn, $queryNIM);
+
+    if ($resultNIM && $resultNIM->num_rows > 0) {
+        $rowNIM = mysqli_fetch_assoc($resultNIM);
+        $NIM = $rowNIM['id_mahasiswa'];
+
+        // Mengambil mata kuliah yang diambil oleh mahasiswa berdasarkan NIM
+        $queryMataKuliah = "SELECT mk.* FROM mata_kuliah mk
+                            JOIN mengambil_mk mmk ON mk.kode_mk = mmk.kode_mk
+                            WHERE mmk.NIM = '$NIM'";
+
+        $resultMataKuliah = mysqli_query($conn, $queryMataKuliah);
+
+        if ($resultMataKuliah) {
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,7 +48,7 @@
                     echo "<div class='bg-white p-4 rounded-md shadow-lg w-[300px] flex flex-col'>";
                     echo "<h5 class='text-xl font-bold mb-2'>".$data['nama_mk']."</h5>";
                     echo "<p class='text-gray-600 mb-5'>(".$data['kode_mk'].")</p>";
-                    echo "<a href='mata-kuliah.php?kode_mk=".$data['kode_mk']."&nama_mhs=".urlencode($namaMahasiswa)."' class='bg-blue-500 text-white py-2 px-4 mt-auto rounded-md content-end'>Lihat Detail</a>";
+                    echo "<a href='mata-kuliah.php?kode_mk=".$data['kode_mk']."&nama_user=".urlencode($namaMahasiswa)."' class='bg-blue-500 text-white py-2 px-4 mt-auto rounded-md content-end'>Lihat Detail</a>";
                     echo "</div>";
                     echo "</div>";
                 }
@@ -33,3 +57,14 @@
     </div>
 </body>
 </html>
+<?php
+        } else {
+            echo "Gagal mengambil data mata kuliah: ".mysqli_error($conn);
+        }
+    } else {
+        echo "Gagal mengambil NIM mahasiswa: ".mysqli_error($conn);
+    }
+} else {
+    echo "Nama Mahasiswa tidak ditemukan.";
+}
+?>
