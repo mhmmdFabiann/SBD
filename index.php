@@ -13,14 +13,14 @@
         background-position: center;
         height: 100vh;
         margin: 0;
+    }
+
+    .container{
         display: flex;
         align-items: center;
         justify-content: center;
     }
 
-    .card {
-        background: #ededed;
-    }
 </style>
 <body>
 <?php
@@ -63,11 +63,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<div class="container mt-5">
-    <div class="flex justify-center">
+<body>
+    <center>
+    <div class="container flex items-center h-screen">
         <div class="w-96">
             <div class="bg-slate-100 shadow-md rounded-md p-4">
-                <div class=" text-slate-300 text-center py-2 mb-4 rounded-md">
+                <div class="text-slate-300 text-center py-2 mb-4 rounded-md">
                     <h2 class="text-lg font-semibold text-black">Login</h2>
                 </div>
                 <form action="index.php" method="POST" role="form">
@@ -77,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="mb-4">
                         <label for="password" class="block text-sm font-medium text-gray-600">Password</label>
-                        <input type="password" name="password" id="password" class="w-full mt-1 p-2  border-2 border-slate-400 rounded-md" required>
+                        <input type="password" name="password" id="password" class="w-full mt-1 p-2 border-2 border-slate-400 rounded-md" required>
                     </div>
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-600">Role</label>
@@ -92,7 +93,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
-</div>
-
+    </center>
 </body>
 </html>

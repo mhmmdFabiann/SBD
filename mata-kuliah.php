@@ -23,8 +23,11 @@
         if (mysqli_num_rows($result_mata_kuliah) > 0) {
             $data_mata_kuliah = mysqli_fetch_assoc($result_mata_kuliah);
             $namaMahasiswa = isset($_GET['nama_user']) ? $_GET['nama_user'] : 'Nama User';
-    ?>
-            <div class="p-3 bg-slate-700 text-slate-100 text-2xl flex w-full justify-between">
+        ?>
+            <div class="p-3 bg-gradient-to-r from-indigo-600 via-blue-600 to-yellow-300 text-slate-100 text-2xl flex w-full justify-between">
+                <header class="text-center">
+                    <img src="unnes_header.png" alt="Header Image" class="w-full">
+                </header>
                 <h2 class="font-bold text-start ml-3">Learning Management System</h2>
                 <div class="flex items-center text-end">
                     <i class="bi bi-person me-2 mb-2"></i>
@@ -42,50 +45,73 @@
                 ?>
                 <div class="m-4">
                     <h2 class="text-2xl font-bold mb-3">Materi Pembelajaran</h2>
-                    <ul class="list-disc list-inside">
-                        <?php
-                        while ($data_materi = mysqli_fetch_assoc($result_materi)) {
-                            echo "<li class='mb-1'>".$data_materi['nama_materi']."</li>";
-                            echo "<li class='mb-1'>".$data_materi['file_materi']."</li>";
-                        }
-                        ?>
-                    </ul>
-                    <a href="addMateri.php?kode_mk=<?php echo $kode_mk; ?>" class="bg-blue-500 text-white px-4 py-2 rounded-md mt-3 inline-block hover:bg-blue-700 transition duration-300 ease-in-out">Tambah Materi</a>
+                    <table class="min-w-full border border-gray-300">
+                        <thead>
+                            <tr>
+                                <th class="border border-gray-300 px-4 py-2">Nama Materi</th>
+                                <th class="border border-gray-300 px-4 py-2">Lampiran Materi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            while ($data_materi = mysqli_fetch_assoc($result_materi)) {
+                                echo "<tr>";
+                                echo "<td class='border border-gray-300 px-4 py-2'>".$data_materi['nama_materi']."</td>";
+                                echo "<td class='border border-gray-300 px-4 py-2'>".$data_materi['lampiran_materi']."</td>";
+                                echo "</tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
                 </div>
 
                 <?php
                 // Ambil data tugas berdasarkan kode_mk
-                $query_tugas = "SELECT * FROM tugas WHERE kode_mk = '$kode_mk'";
+                $query_tugas = "SELECT tugas.*, GROUP_CONCAT(submit_tugas.lampiran_tugas SEPARATOR ', ') AS lampiran_tugas
+                                FROM tugas
+                                LEFT JOIN submit_tugas ON tugas.kode_tugas = submit_tugas.kode_tugas
+                                WHERE tugas.kode_mk = '$kode_mk'
+                                GROUP BY tugas.kode_tugas";
                 $result_tugas = mysqli_query($conn, $query_tugas);
                 ?>
                 <div class="m-4">
                     <h2 class="text-2xl font-bold mb-3">Tugas</h2>
-                    <ul class="list-disc list-inside">
-                        <?php
-                        while ($data_tugas = mysqli_fetch_assoc($result_tugas)) {
-                            echo "<li class='mb-1'>".$data_tugas['nama_tugas']."</li>";
-                        }
-                        ?>
-                    </ul>
-                </div>
 
-                <?php
-                // Ambil data quiz berdasarkan kode_mk
-                $query_quiz = "SELECT * FROM quiz WHERE kode_mk = '$kode_mk'";
-                $result_quiz = mysqli_query($conn, $query_quiz);
-                ?>
-                <div class="m-4">
-                    <h2 class="text-2xl font-bold mb-3">Quiz</h2>
-                    <ul class="list-disc list-inside">
-                        <?php
-                        while ($data_quiz = mysqli_fetch_assoc($result_quiz)) {
-                            echo "<li class='mb-1'>".$data_quiz['nama_quiz']."</li>";
-                        }
-                        ?>
-                    </ul>
+                    <?php
+                    if (mysqli_num_rows($result_tugas) > 0) {
+                    ?>
+                    <table class="min-w-full border border-gray-300">
+                        <thead>
+                            <tr>
+                                <th class="border border-gray-300 px-4 py-2">Nama Tugas</th>
+                                <th class="border border-gray-300 px-4 py-2">Deadline</th>
+                                <th class="border border-gray-300 px-4 py-2">Lampiran Tugas</th>
+                                <th class="border border-gray-300 px-4 py-2">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            while ($data_tugas = mysqli_fetch_assoc($result_tugas)) {
+                                echo "<tr>";
+                                echo "<td class='border border-gray-300 px-4 py-2'>".$data_tugas['nama_tugas']."</td>";
+                                echo "<td class='border border-gray-300 px-4 py-2'>".$data_tugas['deadline']."</td>";
+                                echo "<td class='border border-gray-300 px-4 py-2'><?php echo $data_tugas[lampiran_tugas]; ?></td>";
+                                echo "<td class='border border-gray-300 px-4 py-2'><a href='upload_tugas.php?id_tugas=" . $data_tugas['kode_tugas'] . "&nama_user=" . urlencode($namaMahasiswa) . "' class='bg-blue-500 text-white px-4 py-2 rounded'>Upload Tugas</a></td>";
+                                echo "</tr>";
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+
+                    <?php
+                    } else {
+                        // Tampilkan pesan jika tidak ada tugas
+                        echo "<p class='text-xl font-bold text-red-500'>Tidak ada tugas untuk mata kuliah ini.</p>";
+                    }
+                    ?>
                 </div>
             </div>
-    <?php
+        <?php
         } else {
             // Tampilkan pesan jika mata kuliah tidak ditemukan
             echo "<div class='text-center p-3 text-white bg-danger'>";
