@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Login sukses, arahkan pengguna ke halaman dashboard sesuai tipe pengguna
             $_SESSION['userType'] = $userType;
             $_SESSION['userEmail'] = $email;
-            header("Location: dashboard_" . $userType . ".php");
+            header("Location: " . $userType . ".php");
             exit();
         } else {
             // Password tidak sesuai

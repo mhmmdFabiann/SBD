@@ -1,3 +1,60 @@
+<?php
+session_start();
+if (!isset($_SESSION['userType']) && !isset($_SESSION['userEmail'])) {
+    header("Location: cek_login.php");
+    exit();
+}
+$kodeMk = $_GET['kode_mk'];
+$mhsEmail = $_SESSION['userEmail'];
+// Ambil data mata kuliah dari database
+require_once('koneksi.php'); // Sesuaikan dengan file koneksi Anda
+
+$queryMahasiswa = "SELECT id_mahasiswa FROM mahasiswa WHERE email_mhs = ?";
+$stmtMahasiswa = $conn->prepare($queryMahasiswa);
+$stmtMahasiswa->bind_param('s', $mhsEmail);
+$stmtMahasiswa->execute();
+$resultMahasiswa = $stmtMahasiswa->get_result();
+$mahasiswaData = $resultMahasiswa->fetch_assoc();
+$stmtMahasiswa->close();
+
+$idMahasiswa = $mahasiswaData['id_mahasiswa'];
+
+$queryMkDetail = "SELECT * FROM mata_kuliah WHERE kode_mk = ?";
+$stmtMkDetail = $conn->prepare($queryMkDetail);
+$stmtMkDetail->bind_param('s', $kodeMk);
+$stmtMkDetail->execute();
+$resultMkDetail = $stmtMkDetail->get_result();
+$mkDetail = $resultMkDetail->fetch_assoc();
+$stmtMkDetail->close();
+
+// Ambil data tugas dari database
+$queryTugas = "SELECT * FROM tugas WHERE kode_mk = ?";
+$stmtTugas = $conn->prepare($queryTugas);
+$stmtTugas->bind_param('s', $kodeMk);
+$stmtTugas->execute();
+$resultTugas = $stmtTugas->get_result();
+$tugasData = $resultTugas->fetch_all(MYSQLI_ASSOC);
+$stmtTugas->close();
+
+// Ambil lampiran materi pembelajaran
+$queryLampiran = "SELECT * FROM materi_pembelajaran WHERE kode_mk = ?";
+$stmtLampiran = $conn->prepare($queryLampiran);
+$stmtLampiran->bind_param('s', $kodeMk);
+$stmtLampiran->execute();
+$resultLampiran = $stmtLampiran->get_result();
+$lampiranData = $resultLampiran->fetch_all(MYSQLI_ASSOC);
+$stmtLampiran->close();
+
+$querySubmittedTugas = "SELECT * FROM submit_tugas WHERE kode_tugas = ?";
+$stmtSubmittedTugas = $conn->prepare($querySubmittedTugas);
+$stmtSubmittedTugas->bind_param('s', $tugas['kode_tugas']);
+$stmtSubmittedTugas->execute();
+$resultSubmittedTugas = $stmtSubmittedTugas->get_result();
+$submittedTugasData = $resultSubmittedTugas->fetch_all(MYSQLI_ASSOC);
+$stmtSubmittedTugas->close();
+
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -64,20 +121,14 @@
                         </tbody>
                     </table>
                 </div>
-
-                <?php
-                // Ambil data tugas berdasarkan kode_mk
-                $query_tugas = "SELECT tugas.*, GROUP_CONCAT(submit_tugas.lampiran_tugas SEPARATOR ', ') AS lampiran_tugas
-                                FROM tugas
-                                LEFT JOIN submit_tugas ON tugas.kode_tugas = submit_tugas.kode_tugas
-                                WHERE tugas.kode_mk = '$kode_mk'
-                                GROUP BY tugas.kode_tugas";
-                $result_tugas = mysqli_query($conn, $query_tugas);
-                ?>
                 <div class="m-4">
                     <h2 class="text-2xl font-bold mb-3">Tugas</h2>
 
                     <?php
+                    // Ambil data tugas berdasarkan kode_mk
+                    $query_tugas = "SELECT * FROM tugas WHERE kode_mk = '$kode_mk'";
+                    $result_tugas = mysqli_query($conn, $query_tugas);
+
                     if (mysqli_num_rows($result_tugas) > 0) {
                     ?>
                     <table class="min-w-full border border-gray-300">
@@ -85,8 +136,6 @@
                             <tr>
                                 <th class="border border-gray-300 px-4 py-2">Nama Tugas</th>
                                 <th class="border border-gray-300 px-4 py-2">Deadline</th>
-                                <th class="border border-gray-300 px-4 py-2">Lampiran Tugas</th>
-                                <th class="border border-gray-300 px-4 py-2">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -95,22 +144,69 @@
                                 echo "<tr>";
                                 echo "<td class='border border-gray-300 px-4 py-2'>".$data_tugas['nama_tugas']."</td>";
                                 echo "<td class='border border-gray-300 px-4 py-2'>".$data_tugas['deadline']."</td>";
-                                echo "<td class='border border-gray-300 px-4 py-2'><?php echo $data_tugas[lampiran_tugas]; ?></td>";
-                                echo "<td class='border border-gray-300 px-4 py-2'><a href='upload_tugas.php?id_tugas=" . $data_tugas['kode_tugas'] . "&nama_user=" . urlencode($namaMahasiswa) . "' class='bg-blue-500 text-white px-4 py-2 rounded'>Upload Tugas</a></td>";
                                 echo "</tr>";
                             }
                             ?>
                         </tbody>
                     </table>
-
                     <?php
                     } else {
-                        // Tampilkan pesan jika tidak ada tugas
-                        echo "<p class='text-xl font-bold text-red-500'>Tidak ada tugas untuk mata kuliah ini.</p>";
+                        // Tidak ada tugas yang perlu dikerjakan, hide submission section
+                        ?>
+                        <style>
+                            .submission-section {
+                                display: none;
+                            }
+                        </style>
+                        <?php
                     }
                     ?>
-                </div>
-            </div>
+                    </div>
+                    <div class="m-4 submission-section">
+                        <h2 class="text-2xl font-bold mb-5">Submission<a href="upload_tugas.php" class="bg-green-600 p-3 text-white rounded-lg my-5 ml-5 text-sm" tabindex="-1" role="button" aria-disabled="true">Upload Tugas</a></h2>
+
+                        <?php
+                        // Ambil data pengumpulan tugas berdasarkan kode_mk dan id_mahasiswa
+                        $query_submit_tugas = "SELECT submit_tugas.*, tugas.nama_tugas FROM submit_tugas 
+                                                JOIN tugas ON submit_tugas.kode_tugas = tugas.kode_tugas
+                                                WHERE submit_tugas.id_mahasiswa = '$idMahasiswa'"; // Change id_mahasiswa accordingly.
+                        $result_submit_tugas = mysqli_query($conn, $query_submit_tugas);
+
+                        if (mysqli_num_rows($result_submit_tugas) > 0) {
+                        ?>
+                        <table class="min-w-full border border-gray-300">
+                            <thead>
+                                <tr>
+                                    <th class="border border-gray-300 px-4 py-2">Nama Tugas</th>
+                                    <th class="border border-gray-300 px-4 py-2">Submission Status</th>
+                                    <th class="border border-gray-300 px-4 py-2">Grading Status</th>
+                                    <th class="border border-gray-300 px-4 py-2">File Submissions</th>
+                                    <th class="border border-gray-300 px-4 py-2">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                while ($data_submit_tugas = mysqli_fetch_assoc($result_submit_tugas)) {
+                                    echo "<tr>";
+                                    echo "<td class='border border-gray-300 px-4 py-2'>".$data_submit_tugas['nama_tugas']."</td>";
+                                    echo "<td class='border border-gray-300 px-4 py-2'>".$data_submit_tugas['submission_status']."</td>";
+                                    echo "<td class='border border-gray-300 px-4 py-2'>".$data_submit_tugas['grading']."</td>";
+                                    echo "<td class='border border-gray-300 px-4 py-2'>".$data_submit_tugas['File_submissions']."</td>";
+                                    echo "<td class='border border-gray-300 px-4 py-2'>
+                                            <a href='hapus_tugas.php?id=".$data_submit_tugas['id_mengumpulkan_tugas']."' class='text-blue-500'>Hapus</a>
+                                        </td>";
+                                    echo "</tr>";
+                                }
+                                ?>
+                            </tbody>
+                        </table>
+                        <?php
+                        } else {
+                            // Tampilkan pesan jika tidak ada pengumpulan tugas
+                            echo "<p class='text-xl font-bold text-red-500'>Belum ada tugas yang dikumpulkan.</p>";
+                        }
+                        ?>
+                    </div>
         <?php
         } else {
             // Tampilkan pesan jika mata kuliah tidak ditemukan
@@ -125,5 +221,8 @@
         echo "</div>";
     }
     ?>
+    <div class="mt-4">
+            <a href="mahasiswa.php" class="btn btn-primary">Kembali ke Dashboard</a>
+        </div>
 </body>
 </html>
